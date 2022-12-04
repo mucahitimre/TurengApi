@@ -1,5 +1,5 @@
 using System.Net;
-using System.Xml.Linq;
+using System.Web;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,53 +7,44 @@ namespace Tureng.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class WeatherForecastController : ControllerBase
+public class TurengController : ControllerBase
 {
-    private static readonly string[] Summaries = new[]
-    {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
-
-    private readonly ILogger<WeatherForecastController> _logger;
-
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
-    {
-        _logger = logger;
-    }
-
     [HttpGet(Name = "Translate")]
-    public string Translate(string word)
+    public List<TurengDictionary> Translate(string word)
     {
         var content = GetSiteHtml($"https://tureng.com/tr/turkce-ingilizce/{word}");
-
+        
         var doc = new HtmlDocument();
         doc.LoadHtml(content);
-
         var tableCollection = doc.DocumentNode.SelectNodes("//*[@id=\"englishResultsTable\"]");
 
-        foreach (HtmlNode table in tableCollection)
-        {
-            Console.WriteLine("Found: " + table.Id);
-            foreach (HtmlNode row in table.SelectNodes("tr"))
+        return (from table in tableCollection
+            from row in table.SelectNodes("tr")
+            where row != null && row.ChildNodes.Any() && row.ChildNodes.Count >= 8 && row.ChildNodes[5].ChildNodes.Count >= 4
+            let category = row.ChildNodes[5].ChildNodes[0]
+            let type = row.ChildNodes[5].ChildNodes[2]
+            select new TurengDictionary()
             {
-                Console.WriteLine("row");
-                foreach (HtmlNode cell in row.SelectNodes("th|td"))
-                {
-                    Console.WriteLine("cell: " + cell.InnerText);
-                }
-            }
-        }
-
-        return string.Empty;
+                Category = row.ChildNodes[3].InnerText,
+                Source = category.InnerText + " " + type.InnerText.Trim(),
+                Translate = HttpUtility.HtmlDecode(row.ChildNodes[7].ChildNodes[0].InnerText)
+            }).ToList();
     }
 
     [Obsolete("Obsolete")]
     private static string GetSiteHtml(string url)
     {
         var webClient = new WebClient();
-        webClient.Headers.Add("user-agent", "Only a test!");
+        webClient.Headers.Add("user-agent", "test");
         var html = webClient.DownloadString(url);
 
         return html;
     }
+}
+
+public class TurengDictionary
+{
+    public string Category { get; set; }
+    public string Source { get; set; }
+    public string Translate { get; set; }
 }
