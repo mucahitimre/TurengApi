@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tureng", "Tureng\Tureng.csproj", "{DC0FED9D-27C3-4761-977D-8EDFCB93328E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DC0FED9D-27C3-4761-977D-8EDFCB93328E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC0FED9D-27C3-4761-977D-8EDFCB93328E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC0FED9D-27C3-4761-977D-8EDFCB93328E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC0FED9D-27C3-4761-977D-8EDFCB93328E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
