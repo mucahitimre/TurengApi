@@ -1,5 +1,6 @@
 using System.Net;
 using System.Xml.Linq;
+using HtmlAgilityPack;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Tureng.Controllers;
@@ -23,7 +24,25 @@ public class WeatherForecastController : ControllerBase
     [HttpGet(Name = "Translate")]
     public string Translate(string word)
     {
-        var content = GetSiteHtml($"http://tureng.com/tr/turkce-ingilizce/{word}");
+        var content = GetSiteHtml($"https://tureng.com/tr/turkce-ingilizce/{word}");
+
+        var doc = new HtmlDocument();
+        doc.LoadHtml(content);
+
+        var tableCollection = doc.DocumentNode.SelectNodes("//*[@id=\"englishResultsTable\"]");
+
+        foreach (HtmlNode table in tableCollection)
+        {
+            Console.WriteLine("Found: " + table.Id);
+            foreach (HtmlNode row in table.SelectNodes("tr"))
+            {
+                Console.WriteLine("row");
+                foreach (HtmlNode cell in row.SelectNodes("th|td"))
+                {
+                    Console.WriteLine("cell: " + cell.InnerText);
+                }
+            }
+        }
 
         return string.Empty;
     }
@@ -31,8 +50,9 @@ public class WeatherForecastController : ControllerBase
     [Obsolete("Obsolete")]
     private static string GetSiteHtml(string url)
     {
-        var wc = new WebClient();
-        var html = wc.DownloadString(url);
+        var webClient = new WebClient();
+        webClient.Headers.Add("user-agent", "Only a test!");
+        var html = webClient.DownloadString(url);
 
         return html;
     }
