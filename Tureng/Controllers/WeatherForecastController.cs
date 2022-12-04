@@ -1,3 +1,5 @@
+using System.Net;
+using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Tureng.Controllers;
@@ -18,15 +20,20 @@ public class WeatherForecastController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<WeatherForecast> Get()
+    [HttpGet(Name = "Translate")]
+    public string Translate(string word)
     {
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+        var content = GetSiteHtml($"http://tureng.com/tr/turkce-ingilizce/{word}");
+
+        return string.Empty;
+    }
+
+    [Obsolete("Obsolete")]
+    private static string GetSiteHtml(string url)
+    {
+        var wc = new WebClient();
+        var html = wc.DownloadString(url);
+
+        return html;
     }
 }
